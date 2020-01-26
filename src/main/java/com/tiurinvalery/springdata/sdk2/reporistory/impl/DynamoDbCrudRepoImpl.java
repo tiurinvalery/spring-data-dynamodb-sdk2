@@ -38,21 +38,21 @@ public class DynamoDbCrudRepoImpl implements DynamoDbCrudRepo {
     @Autowired
     private DynamoDbAsyncClient dynamoDbAsyncClient;
 
-    @Override
-    public CompletableFuture<BatchWriteItemResponse> save(Object entity) {
-        List<WriteRequest> writeRequests = List.of(WriteRequest.builder()
-                .putRequest(PutRequest.builder()
-                        .item(Map.of("1", AttributeValue.builder()
-                                .s("2").build(), "2", AttributeValue.builder()
-                                .s("3").build()))
-                        .build())
-                .build());
-
-        BatchWriteItemRequest batchedWriteRequest = BatchWriteItemRequest.builder()
-                .requestItems(Map.of("tableName", writeRequests))
-                .build();
-        return dynamoDbAsyncClient.batchWriteItem(batchedWriteRequest);
-    }
+//    @Override
+//    public CompletableFuture<BatchWriteItemResponse> save(Object entity) {
+//        List<WriteRequest> writeRequests = List.of(WriteRequest.builder()
+//                .putRequest(PutRequest.builder()
+//                        .item(Map.of("1", AttributeValue.builder()
+//                                .s("2").build(), "2", AttributeValue.builder()
+//                                .s("3").build()))
+//                        .build())
+//                .build());
+//
+//        BatchWriteItemRequest batchedWriteRequest = BatchWriteItemRequest.builder()
+//                .requestItems(Map.of("tableName", writeRequests))
+//                .build();
+//        return dynamoDbAsyncClient.batchWriteItem(batchedWriteRequest);
+//    }
 
     @Override
     public CompletableFuture<PutItemResponse> putItem() {
@@ -83,51 +83,6 @@ public class DynamoDbCrudRepoImpl implements DynamoDbCrudRepo {
         return dynamoDbAsyncClient.batchGetItem(getItemRequest);
     }
 
-    @Override
-    public CompletableFuture<CreateTableResponse> createTable() {
-        CreateTableRequest request = CreateTableRequest.builder()
-                .attributeDefinitions(List.of(AttributeDefinition.builder()
-                                .attributeName("1")
-                                .attributeType(ScalarAttributeType.S)
-                                .build(),
-
-                        AttributeDefinition.builder()
-                                .attributeName("2")
-                                .attributeType(ScalarAttributeType.S)
-                                .build()
-                ))
-                .keySchema(KeySchemaElement.builder()
-                                .attributeName("1")
-                                .keyType(KeyType.HASH)
-                                .build(),
-                        KeySchemaElement.builder()
-                                .attributeName("2")
-                                .keyType(KeyType.RANGE)
-                                .build())
-
-                .provisionedThroughput(ProvisionedThroughput.builder()
-                        .readCapacityUnits(new Long(10))
-                        .writeCapacityUnits(new Long(10))
-                        .build())
-                .tableName("tableName")
-                .build();
-
-        return dynamoDbAsyncClient.createTable(request);
-    }
-
-    @Override
-    public CompletableFuture<DeleteTableResponse> deleteTable() {
-        return dynamoDbAsyncClient.deleteTable(DeleteTableRequest.builder()
-                .tableName("tableName")
-                .build());
-    }
-
-    @Override
-    public CompletableFuture<DescribeTableResponse> describeTable() {
-         return dynamoDbAsyncClient.describeTable(DescribeTableRequest.builder()
-                .tableName("tableName")
-                .build());
-    }
 
 //    @Override
 //    public boolean existsById(Object o) {
