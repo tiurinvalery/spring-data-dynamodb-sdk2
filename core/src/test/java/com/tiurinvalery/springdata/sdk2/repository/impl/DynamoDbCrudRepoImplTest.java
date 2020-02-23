@@ -26,43 +26,43 @@ public class DynamoDbCrudRepoImplTest {
     @Autowired
     DynamoDbCrudRepo dynamoDbCrudRepo;
 
-    @Test
-    public void putItemTest() throws Exception {
-        CompletableFuture<CreateTableResponse> table = dslService.createTable();
-        System.out.println(table.get().tableDescription().toString());
-        try {
-            CompletableFuture<PutItemResponse> putItemResponseCompletableFuture = dynamoDbCrudRepo.putItem();
-            putItemResponseCompletableFuture.thenApply(result -> {
-                System.out.println("HERE WE GO");
-                System.out.println(result);
-                return result;
-            });
-        } finally {
-            dslService.deleteTable();
-        }
-    }
+//    @Test
+//    public void putItemTest() throws Exception {
+//        CompletableFuture<CreateTableResponse> table = dslService.createTable();
+//        System.out.println(table.get().tableDescription().toString());
+//        try {
+//            CompletableFuture<PutItemResponse> putItemResponseCompletableFuture = dynamoDbCrudRepo.putItem();
+//            putItemResponseCompletableFuture.thenApply(result -> {
+//                System.out.println("HERE WE GO");
+//                System.out.println(result);
+//                return result;
+//            });
+//        } finally {
+//            dslService.deleteTable();
+//        }
+//    }
 
-    @Test
-    public void getItemTest() throws Exception {
-        CompletableFuture<CreateTableResponse> table = dslService.createTable();
-        System.out.println(table.get().tableDescription().toString());
-        try {
-            CompletableFuture<PutItemResponse> putItemResponseCompletableFuture = dynamoDbCrudRepo.putItem();
-            putItemResponseCompletableFuture.thenApply(result -> {
-                System.out.println("HERE WE GO");
-                System.out.println(result);
-                return result;
-            });
-            CompletableFuture<BatchGetItemResponse> byId = dynamoDbCrudRepo.findById(new Object(), true);
-            System.out.println(byId.thenApply(result ->
-            {
-                System.out.println(result);
-                return result;
-            }));
-        } finally {
-            dslService.deleteTable();
-        }
-    }
+//    @Test
+//    public void getItemTest() throws Exception {
+//        CompletableFuture<CreateTableResponse> table = dslService.createTable();
+//        System.out.println(table.get().tableDescription().toString());
+//        try {
+//            CompletableFuture<PutItemResponse> putItemResponseCompletableFuture = dynamoDbCrudRepo.putItem();
+//            putItemResponseCompletableFuture.thenApply(result -> {
+//                System.out.println("HERE WE GO");
+//                System.out.println(result);
+//                return result;
+//            });
+//            CompletableFuture<BatchGetItemResponse> byId = dynamoDbCrudRepo.findById(new Object(), true);
+//            System.out.println(byId.thenApply(result ->
+//            {
+//                System.out.println(result);
+//                return result;
+//            }));
+//        } finally {
+//            dslService.deleteTable();
+//        }
+//    }
 
 //    @Test
 //    public void deleteItemTest() throws Exception {

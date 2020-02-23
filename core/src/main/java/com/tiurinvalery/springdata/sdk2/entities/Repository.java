@@ -1,4 +1,4 @@
-package com.tiurinvalery.springdata.sdk2.parser.data;
+package com.tiurinvalery.springdata.sdk2.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Attribute {
+public class Repository {
 
-    private String name;
-
+    private Class targetClass;
 }

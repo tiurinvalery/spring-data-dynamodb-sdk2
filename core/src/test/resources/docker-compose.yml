@@ -3,7 +3,7 @@ services:
 
     dynamodb:
         environment:
-                - AWS_ACCESS_KEY_ID=1234
+                - AWS_ACCESS_KEY_ID=qwerty
                 - AWS_SECRET_ACCESS_KEY=5678
                 - AWS_REGION=us-west-2
         image: amazon/dynamodb-local

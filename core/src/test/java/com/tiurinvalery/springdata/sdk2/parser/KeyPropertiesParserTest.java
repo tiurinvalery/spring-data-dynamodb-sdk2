@@ -1,23 +1,23 @@
 package com.tiurinvalery.springdata.sdk2.parser;
 
-import com.tiurinvalery.springdata.sdk2.constants.KeyType;
 import com.tiurinvalery.springdata.sdk2.model.User;
 import com.tiurinvalery.springdata.sdk2.parser.data.KeyProperties;
 import com.tiurinvalery.springdata.sdk2.parser.data.Parseable;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.InjectMocks;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import software.amazon.awssdk.services.dynamodb.model.KeyType;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 
-@RunWith(SpringRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 @SpringBootTest
 public class KeyPropertiesParserTest {
 
-    @Autowired
+    @InjectMocks
     private KeyParser keyParser;
 
     @Test

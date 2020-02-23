@@ -21,20 +21,20 @@ public class DSLServiceImplTest {
     @Autowired
     DSLServiceImpl dslService;
 
-    @Test
-    public void createTableTest() throws Exception {
-        CompletableFuture<CreateTableResponse> table = dslService.createTable();
-        System.out.println(table.get().tableDescription().toString());
-        assertNotNull(table.get().tableDescription().toString());
-        dslService.deleteTable();
-    }
-
-    @Test(expected = ExecutionException.class)
-    public void deleteTableTest() throws Exception {
-        CompletableFuture<DeleteTableResponse> deleteTableResponseCompletableFuture = dslService.deleteTable();
-        System.out.println(deleteTableResponseCompletableFuture.get().toString());
-        CompletableFuture<DescribeTableResponse> describeTableResponseCompletableFuture = dslService.describeTable();
-        System.out.println(describeTableResponseCompletableFuture.get().toString());
-    }
+//    @Test
+//    public void createTableTest() throws Exception {
+//        CompletableFuture<CreateTableResponse> table = dslService.createTable();
+//        System.out.println(table.get().tableDescription().toString());
+//        assertNotNull(table.get().tableDescription().toString());
+//        dslService.deleteTable();
+//    }
+//
+//    @Test(expected = ExecutionException.class)
+//    public void deleteTableTest() throws Exception {
+//        CompletableFuture<DeleteTableResponse> deleteTableResponseCompletableFuture = dslService.deleteTable();
+//        System.out.println(deleteTableResponseCompletableFuture.get().toString());
+//        CompletableFuture<DescribeTableResponse> describeTableResponseCompletableFuture = dslService.describeTable();
+//        System.out.println(describeTableResponseCompletableFuture.get().toString());
+//    }
 
 }

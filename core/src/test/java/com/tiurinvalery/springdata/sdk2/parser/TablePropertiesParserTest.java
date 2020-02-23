@@ -1,25 +1,30 @@
 package com.tiurinvalery.springdata.sdk2.parser;
 
+import com.tiurinvalery.springdata.sdk2.model.Car;
 import com.tiurinvalery.springdata.sdk2.model.User;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.mockito.InjectMocks;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
+@RunWith(MockitoJUnitRunner.class)
 public class TablePropertiesParserTest {
 
-    @Autowired
+    @InjectMocks
     private TableParser tableParser;
 
     @Test
     public void parseTest() {
         User user = new User();
         assertEquals("USER", tableParser.parse(user).getTableName());
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void parseEmptyNameTest() {
+        Car car = new Car();
+        tableParser.parse(car);
     }
 
 }

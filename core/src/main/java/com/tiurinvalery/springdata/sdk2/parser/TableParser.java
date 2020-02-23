@@ -12,11 +12,16 @@ public class TableParser implements Parser {
     @Override
     public TableProperties parse(Object object) {
         Annotation[] annotations = object.getClass().getAnnotations();
-        for(Annotation annotation : annotations) {
-            if(annotation instanceof Table) {
-                return TableProperties.builder()
-                        .tableName(((Table) annotation).tableName())
-                        .build();
+        for (Annotation annotation : annotations) {
+            if (annotation instanceof Table) {
+                String tableName = ((Table) annotation).tableName();
+                if (!tableName.isBlank()) {
+                    return TableProperties.builder()
+                            .tableName(tableName)
+                            .build();
+                } else {
+                    throw new RuntimeException("Name for table cannot be empty");
+                }
             }
         }
         return null;

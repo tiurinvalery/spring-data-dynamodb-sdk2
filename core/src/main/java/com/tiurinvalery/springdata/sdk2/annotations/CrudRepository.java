@@ -1,18 +1,15 @@
 package com.tiurinvalery.springdata.sdk2.annotations;
 
 
-import software.amazon.awssdk.services.dynamodb.model.KeyType;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
-public @interface Key {
 
-    String fieldName();
+public @interface CrudRepository {
 
-    KeyType keyType();
+    Class clazz();
 }
