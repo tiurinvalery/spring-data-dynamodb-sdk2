@@ -1,6 +1,7 @@
 package com.tiurinvalery.springdata.sdk2.repository.impl;
 
 import com.tiurinvalery.springdata.sdk2.entities.Item;
+import com.tiurinvalery.springdata.sdk2.parser.data.KeyProperties;
 import com.tiurinvalery.springdata.sdk2.repository.DynamoDbCrudRepo;
 import com.tiurinvalery.springdata.sdk2.service.ClassLoaderServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,8 @@ import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
+import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
 
@@ -64,25 +67,30 @@ public class DynamoDbCrudRepoImpl implements DynamoDbCrudRepo {
         }
     }
 
-//    @Override
-//    public Collection<AttributeValue> findById(String hashId) {
-//
-//        Map<String, AttributeValue> keyToGet =
-//                new HashMap<>();
-//        keyToGet.put("USER_ID", AttributeValue.builder().s(hashId).build());
-//        DescribeTableResponse table_name = dynamoDbAsyncClient.describeTable(DescribeTableRequest.builder()
-//                .tableName("table_name")
-//                .build()).join();
-//        dynamoDbAsyncClient.putItem(PutItemRequest.builder()
-//                .tableName("table_name")
-//                .item(Map.of("USER_ID", AttributeValue.builder().s("1").build()))
-//                .build());
-//        CompletableFuture<GetItemResponse> itemsFuture = dynamoDbAsyncClient.getItem(GetItemRequest.builder()
-//                .tableName("table_name")
-//                .key(keyToGet)
-//                .build());
-//        return itemsFuture.join().item().values();
-//    }
+    @Override
+    public CompletableFuture<GetItemResponse> findById(Object objectWithIds) {
+        Item targetItem = classLoaderService.getEntityItems().stream().filter(item -> item.getClazz().isInstance(objectWithIds)).findFirst().orElse(null);
+        if (null != targetItem) {
+            Map<String, AttributeValue> keyToGet = new HashMap<>();
+            targetItem.getKeys().forEach((key, value) -> {
+                try {
+                    Field declaredField = objectWithIds.getClass().getDeclaredField(key);
+                    declaredField.setAccessible(true);
+                    keyToGet.put(value.getFieldName(), AttributeValue.builder().s(declaredField.get(objectWithIds).toString()).build());
+                } catch (NoSuchFieldException noFieldException) {
+                    throw new RuntimeException("Problem with field pasrsing on get");
+                } catch (IllegalAccessException ex) {
+                    throw new RuntimeException("Can't access field on get");
+                }
+            });
+            CompletableFuture<GetItemResponse> itemsFuture = dynamoDbAsyncClient.getItem(GetItemRequest.builder()
+                    .tableName(targetItem.getTableName())
+                    .key(keyToGet)
+                    .build());
+            return itemsFuture;
+        }
+        throw new RuntimeException("Class for getItem not found");
+    }
 //
 //
 //    @Override

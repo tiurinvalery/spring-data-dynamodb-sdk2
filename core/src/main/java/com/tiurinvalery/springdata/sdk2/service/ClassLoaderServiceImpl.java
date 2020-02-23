@@ -1,7 +1,6 @@
 package com.tiurinvalery.springdata.sdk2.service;
 
 import com.tiurinvalery.springdata.sdk2.annotations.Attribute;
-import com.tiurinvalery.springdata.sdk2.annotations.CrudRepository;
 import com.tiurinvalery.springdata.sdk2.annotations.Key;
 import com.tiurinvalery.springdata.sdk2.annotations.Table;
 import com.tiurinvalery.springdata.sdk2.entities.Item;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.support.GenericWebApplicationContext;
 
 import javax.annotation.PostConstruct;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.HashSet;

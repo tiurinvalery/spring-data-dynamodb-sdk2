@@ -20,6 +20,8 @@ public class TestService {
                 .username("username")
                 .UUID("swa-123-dfsas")
                 .build();
-        dynamoDbCrudRepo.putItem(user).join();
+//        dynamoDbCrudRepo.putItem(user).join();
+        dynamoDbCrudRepo.findById(user).join();
+
     }
 }
