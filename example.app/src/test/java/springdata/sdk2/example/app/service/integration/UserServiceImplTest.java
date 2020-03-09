@@ -1,4 +1,4 @@
-package springdata.sdk2.example.app.service;
+package springdata.sdk2.example.app.service.integration;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,6 +10,7 @@ import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
 import springdata.sdk2.example.app.exception.InvalidRequiredAttributeException;
 import springdata.sdk2.example.app.model.User;
+import springdata.sdk2.example.app.service.UserServiceImpl;
 
 import java.util.Random;
 
@@ -19,7 +20,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class TestServiceUserImpl {
+public class UserServiceImplTest {
 
     @Autowired
     private UserServiceImpl userService;
