@@ -34,7 +34,7 @@ public class EntityParser {
                 key = f.getAnnotationsByType(Key.class)[0];
                 item.setKeys(Map.of(f.getName(), KeyProperties.builder().fieldName(key.fieldName()).keyType(key.keyType()).build()));
             } else {
-                throw new RuntimeException("Support for more than 1 Key per entity not implemented yet");
+//                throw new RuntimeException("Support for more than 1 Key per entity not implemented yet");
             }
         } catch (NullPointerException npe) {
             System.out.println(npe);

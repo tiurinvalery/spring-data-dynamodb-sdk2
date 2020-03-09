@@ -22,4 +22,7 @@ public class User {
 
     @Attribute(name = "USERNAME")
     private String username;
+
+    @Attribute(name = "APPROVED" )
+    private String approvedUser;
 }

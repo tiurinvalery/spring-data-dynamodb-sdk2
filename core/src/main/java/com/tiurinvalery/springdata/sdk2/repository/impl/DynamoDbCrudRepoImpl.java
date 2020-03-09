@@ -13,6 +13,7 @@ import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
+
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
@@ -40,13 +41,19 @@ public class DynamoDbCrudRepoImpl implements DynamoDbCrudRepo {
                         try {
                             Field field = targetItem.getClazz().getDeclaredField(es.getKey());
                             field.setAccessible(true);
-                            return Map.of(es.getValue(), field.get(object).toString());
+                            Object value = field.get(object);
+                            if (null != value) {
+                                return Map.of(es.getValue(), value.toString());
+                            } else {
+                                return Map.of(es.getValue(), "NOLL");
+                            }
                         } catch (NoSuchFieldException fieldException) {
                             throw new RuntimeException("Error with field mapping");
                         } catch (IllegalAccessException ilegalAccess) {
                             throw new RuntimeException("Trouble with field access");
                         }
                     })
+                    .filter(this::deleteEmptyValues)
                     .collect(Collectors.toList());
             Map<String, AttributeValue> requestMap = new HashMap<>();
             for (Map<String, String> map : collect) {
@@ -112,6 +119,15 @@ public class DynamoDbCrudRepoImpl implements DynamoDbCrudRepo {
                     .build());
         }
         throw new RuntimeException("Class for getItem not found");
+    }
+
+    private boolean deleteEmptyValues(Map<String, String> originMap) {
+        for (Map.Entry entry : originMap.entrySet()) {
+            if (!"NOLL".equals(entry.getValue())) {
+                return true;
+            }
+        }
+        return false;
     }
 //
 //    @Override

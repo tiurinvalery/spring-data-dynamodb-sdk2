@@ -44,5 +44,33 @@ public class UserServiceImpl {
         return dynamoDbCrudRepo.delete(User.builder().UUID(uuid).build()).join();
     }
 
+    public void approveUser(String uuid) {
+        GetItemResponse userCreated = getUser(uuid);
 
+        if (userCreated.item().size() > 0) {
+            String username = userCreated.item().get("USERNAME").s();
+            if (checkUserEmailApprovedFromThirdParty(username)) {
+                saveUser(User.builder()
+                        .username(username)
+                        .UUID(uuid)
+                        .approvedUser("y")
+                        .build());
+            } else {
+                saveUser(User.builder()
+                        .username(username)
+                        .UUID(uuid)
+                        .approvedUser("n")
+                        .build());
+            }
+        }
+    }
+
+
+    private boolean checkUserEmailApprovedFromThirdParty(String username) {
+        if (username.hashCode() % 2 == 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
