@@ -31,8 +31,11 @@ public class EntityParser {
     public static Key parseField(Item item, Map<String, String> fieldMappingMap, Key key, Field f) {
         try {
             if (null == key) {
-                key = f.getAnnotationsByType(Key.class)[0];
-                item.setKeys(Map.of(f.getName(), KeyProperties.builder().fieldName(key.fieldName()).keyType(key.keyType()).build()));
+                Key[] annotationsByType = f.getAnnotationsByType(Key.class);
+                if (annotationsByType.length == 1) {
+                    key = annotationsByType[0];
+                    item.setKeys(Map.of(f.getName(), KeyProperties.builder().fieldName(key.fieldName()).keyType(key.keyType()).build()));
+                }
             } else {
 //                throw new RuntimeException("Support for more than 1 Key per entity not implemented yet");
             }
@@ -41,7 +44,7 @@ public class EntityParser {
         }
         try {
             Attribute[] annotationsByType = f.getAnnotationsByType(Attribute.class);
-            if(annotationsByType != null && annotationsByType.length > 0) {
+            if (annotationsByType != null && annotationsByType.length > 0) {
                 fieldMappingMap.put(f.getName(), annotationsByType[0].name());
             }
 //            Attribute attribute = f.getAnnotationsByType(Attribute.class)[0];

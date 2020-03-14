@@ -25,7 +25,7 @@ public class KeyPropertiesParserTest {
         User user = new User();
         user.uuid = "s-123-dfsa";
         Parseable result = keyParser.parse(user);
-        assertEquals("UUID", ((KeyProperties) result).getFieldName());
+        assertEquals("uuid", ((KeyProperties) result).getFieldName());
         assertEquals(KeyType.HASH, ((KeyProperties) result).getKeyType());
     }
 }

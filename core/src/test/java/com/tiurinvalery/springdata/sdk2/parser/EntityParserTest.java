@@ -23,7 +23,7 @@ class EntityParserTest {
 
         KeyProperties expected = KeyProperties.builder()
                 .keyType(KeyType.HASH)
-                .fieldName("UUID")
+                .fieldName("uuid")
                 .build();
 
         Key key = EntityParser.parseField(ref, fieldMapping, null, uuid);

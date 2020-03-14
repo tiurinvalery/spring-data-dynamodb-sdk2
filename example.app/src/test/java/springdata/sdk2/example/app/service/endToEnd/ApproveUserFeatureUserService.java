@@ -31,22 +31,22 @@ public class ApproveUserFeatureUserService {
     @Before
     public void initUser() {
         this.user = User.builder()
-                .UUID("uuid" + random.nextInt() + random.nextLong())
+                .uuid("uuid" + random.nextInt() + random.nextLong())
                 .username("username" + random.nextLong())
                 .build();
     }
 
     @After
     public void deleteTestUser() {
-        userService.deleteUser(user.getUUID());
+        userService.deleteUser(user.getUuid());
     }
 
     @Test
     public void approveUserTest() {
         iCreateUser(user);
-        andIFoundThatUserExistWithoutApprove(user.getUUID(), user.getUsername());
-        andIApproveUserBasedOnFakeThirdPartyResponse(user.getUUID());
-        andIFoundThatUserApprovedStateEqualsToThirdPartyResponse(user.getUUID(), user.getUsername());
+        andIFoundThatUserExistWithoutApprove(user.getUuid(), user.getUsername());
+        andIApproveUserBasedOnFakeThirdPartyResponse(user.getUuid());
+        andIFoundThatUserApprovedStateEqualsToThirdPartyResponse(user.getUuid(), user.getUsername());
     }
 
     private void iCreateUser(User user) {
@@ -54,7 +54,7 @@ public class ApproveUserFeatureUserService {
     }
 
     private void andIFoundThatUserExistWithoutApprove(String uuid, String usernameExpected) {
-        GetItemResponse user = userService.getUser(uuid);
+        GetItemResponse user = userService.getUser(uuid).join();
         String username = user.item().get("USERNAME").s();
         AttributeValue approved = user.item().get("APPROVED");
 
@@ -69,7 +69,7 @@ public class ApproveUserFeatureUserService {
     private void andIFoundThatUserApprovedStateEqualsToThirdPartyResponse(String uuid, String usernameExpected) {
         String expected = usernameExpected.hashCode() % 2 == 0 ? "y" : "n";
 
-        GetItemResponse user = userService.getUser(uuid);
+        GetItemResponse user = userService.getUser(uuid).join();
         String username = user.item().get("USERNAME").s();
         AttributeValue approved = user.item().get("APPROVED");
 

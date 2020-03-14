@@ -31,7 +31,7 @@ public class UserServiceImplTest {
     public void saveUserTest() {
         String randomUsername = "username" + random.nextLong() + random.nextLong();
         String UUID = "uuid-" + random.nextInt() + random.nextInt();
-        PutItemResponse putItemResponse = userService.saveUser(User.builder().UUID(UUID).username(randomUsername).build());
+        PutItemResponse putItemResponse = userService.saveUser(User.builder().uuid(UUID).username(randomUsername).build()).join();
 
         assertNotNull(putItemResponse);
         assertTrue(putItemResponse.sdkHttpResponse().isSuccessful());
@@ -41,7 +41,7 @@ public class UserServiceImplTest {
     public void saveUserTestUUIDNull() {
         String randomUsername = "username" + random.nextLong() + random.nextLong();
 
-        userService.saveUser(User.builder().UUID(null).username(randomUsername).build());
+        userService.saveUser(User.builder().uuid(null).username(randomUsername).build());
     }
 
     @Test(expected = InvalidRequiredAttributeException.class)
@@ -49,38 +49,38 @@ public class UserServiceImplTest {
 
         String randomUsername = "username" + random.nextLong() + random.nextLong();
 
-        userService.saveUser(User.builder().UUID("trash_value").username(randomUsername).build());
+        userService.saveUser(User.builder().uuid("trash_value").username(randomUsername).build());
     }
 
     @Test
     public void getUserTest() {
         String randomUsername = "username" + random.nextLong() + random.nextLong();
         String UUID = "uuid-" + random.nextInt() + random.nextInt();
-        userService.saveUser(User.builder().UUID(UUID).username(randomUsername).build());
+        userService.saveUser(User.builder().uuid(UUID).username(randomUsername).build());
 
-        GetItemResponse user = userService.getUser(UUID);
+        GetItemResponse user = userService.getUser(UUID).join();
 
         assertNotNull(user);
-        
+
         String username = user.item().get("USERNAME").s();
         assertEquals(randomUsername, username);
     }
-    
+
     @Test
     public void deleteUserTest() {
         String randomUsername = "username" + random.nextLong() + random.nextLong();
         String UUID = "uuid-" + random.nextInt() + random.nextInt();
-        userService.saveUser(User.builder().UUID(UUID).username(randomUsername).build());
+        userService.saveUser(User.builder().uuid(UUID).username(randomUsername).build());
 
-        GetItemResponse user = userService.getUser(UUID);
+        GetItemResponse user = userService.getUser(UUID).join();
 
         assertNotNull(user);
 
         DeleteItemResponse deleteItemResponse = userService.deleteUser(UUID);
-        
+
         assertTrue(deleteItemResponse.sdkHttpResponse().isSuccessful());
 
-        GetItemResponse mustBeEmpty = userService.getUser(UUID);
+        GetItemResponse mustBeEmpty = userService.getUser(UUID).join();
 
         assertTrue(mustBeEmpty.item().isEmpty());
     }

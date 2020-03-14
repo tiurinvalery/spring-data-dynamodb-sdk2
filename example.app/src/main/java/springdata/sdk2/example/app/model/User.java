@@ -18,11 +18,11 @@ public class User {
 
     @Key(fieldName = "UUID", keyType = KeyType.HASH)
     @Attribute(name = "UUID")
-    private String UUID;
+    private String uuid;
 
     @Attribute(name = "USERNAME")
     private String username;
 
-    @Attribute(name = "APPROVED" )
+    @Attribute(name = "APPROVED")
     private String approvedUser;
 }
