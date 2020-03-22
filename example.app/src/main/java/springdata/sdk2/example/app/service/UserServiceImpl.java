@@ -3,16 +3,11 @@ package springdata.sdk2.example.app.service;
 import com.tiurinvalery.springdata.sdk2.repository.DynamoDbCrudRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
-import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.DeleteItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
-import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
 import springdata.sdk2.example.app.exception.InvalidRequiredAttributeException;
 import springdata.sdk2.example.app.model.User;
-
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 
@@ -22,8 +17,6 @@ public class UserServiceImpl {
     @Autowired
     private DynamoDbCrudRepo dynamoDbCrudRepo;
 
-    @Autowired
-    private DynamoDbClient dynamoDbClient;
 
 //    @PostConstruct
 //    public void test() {
@@ -49,12 +42,6 @@ public class UserServiceImpl {
         return dynamoDbCrudRepo.save(user);
     }
 
-    public PutItemResponse saveUserSyncClient(String tableName, Map<String, AttributeValue> fields) {
-        return dynamoDbClient.putItem(PutItemRequest.builder()
-                .tableName(tableName)
-                .item(fields)
-                .build());
-    }
 
     public DeleteItemResponse deleteUser(String uuid) {
         return dynamoDbCrudRepo.delete(User.builder().uuid(uuid).build()).join();
