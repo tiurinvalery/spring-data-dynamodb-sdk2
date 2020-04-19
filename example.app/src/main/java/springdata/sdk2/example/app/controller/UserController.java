@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
-import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
 import springdata.sdk2.example.app.model.User;
 import springdata.sdk2.example.app.service.GenerateUsersForLoadTestService;
 import springdata.sdk2.example.app.service.UserServiceImpl;

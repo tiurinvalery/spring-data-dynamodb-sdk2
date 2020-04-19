@@ -2,7 +2,7 @@ package com.tiurinvalery.springdata.sdk2.repository.impl;
 
 import com.tiurinvalery.springdata.sdk2.entities.Item;
 import com.tiurinvalery.springdata.sdk2.repository.DynamoDbCrudRepo;
-import com.tiurinvalery.springdata.sdk2.service.ClassLoaderServiceImpl;
+import com.tiurinvalery.springdata.sdk2.service.TargetComponentsLoaderServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
@@ -28,7 +28,7 @@ public class DynamoDbCrudRepoImpl implements DynamoDbCrudRepo {
     private DynamoDbAsyncClient dynamoDbAsyncClient;
 
     @Autowired
-    private ClassLoaderServiceImpl classLoaderService;
+    private TargetComponentsLoaderServiceImpl classLoaderService;
 
     @Override
     public CompletableFuture<PutItemResponse> save(Object object) {

@@ -20,7 +20,7 @@ import static com.tiurinvalery.springdata.sdk2.parser.EntityParser.defineKeyAndA
 import static com.tiurinvalery.springdata.sdk2.parser.EntityParser.defineTableName;
 
 @Service
-public class ClassLoaderServiceImpl {
+public class TargetComponentsLoaderServiceImpl {
 
     @Value("${spring.data.dynamodb.sdkv2.packages.entities}")
     private String entities;

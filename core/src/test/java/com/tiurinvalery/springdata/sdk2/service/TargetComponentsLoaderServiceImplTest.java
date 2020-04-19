@@ -10,11 +10,11 @@ import static org.junit.Assert.assertEquals;
 
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {ClassLoaderServiceImpl.class})
-class ClassLoaderServiceImplTest {
+@SpringBootTest(classes = {TargetComponentsLoaderServiceImpl.class})
+class TargetComponentsLoaderServiceImplTest {
 
     @Autowired
-    private ClassLoaderServiceImpl classLoaderService;
+    private TargetComponentsLoaderServiceImpl classLoaderService;
 
     @Test
     void createItemList() {
