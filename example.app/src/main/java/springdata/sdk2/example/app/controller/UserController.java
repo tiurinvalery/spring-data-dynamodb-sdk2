@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
+import software.amazon.awssdk.services.dynamodb.model.QueryResponse;
 import springdata.sdk2.example.app.model.User;
 import springdata.sdk2.example.app.service.GenerateUsersForLoadTestService;
 import springdata.sdk2.example.app.service.UserServiceImpl;
@@ -31,6 +32,11 @@ public class UserController {
     @GetMapping("/user/{user_id}")
     public ResponseEntity<GetItemResponse> getUser(@PathVariable(name = "user_id") String userId) {
         return ResponseEntity.ok(userService.getUser(userId).join());
+    }
+
+    @GetMapping("/user/username/{username}")
+    public ResponseEntity<QueryResponse> getUserViaUsername(@PathVariable(name = "username") String username) {
+        return ResponseEntity.ok(userService.findUserByUsername(username).join());
     }
 
     @PostMapping("/user/create")

@@ -19,6 +19,8 @@ import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.QueryRequest;
 import software.amazon.awssdk.services.dynamodb.model.QueryResponse;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -102,7 +104,8 @@ public class DynamoDbCrudRepoImpl implements DynamoDbCrudRepo {
         throw new RuntimeException("Class for getItem not found");
     }
 
-    public CompletableFuture<QueryResponse> findBySecondaryIndexes(Object objectWithIndex) {
+    @Override
+    public CompletableFuture<QueryResponse> findBySecondaryIndexes(@Valid @NotNull Object objectWithIndex) {
         Item item = classLoaderService.getEntityItems().stream().filter(item1 -> item1.getClazz().isInstance(objectWithIndex)).findFirst().orElse(null);
         if (null != item) {
             List<Index> indexes = item.getIndexes();
@@ -111,41 +114,9 @@ public class DynamoDbCrudRepoImpl implements DynamoDbCrudRepo {
             Map<String, List<AttributeValue>> dbAttributeNameToValRestrictions = new HashMap<>();
 
             for (int i = 0; i < indexes.size(); i++) {
-                Index index = indexes.get(i);
-                try {
-                    Field declaredField = objectWithIndex.getClass().getDeclaredField(index.getFieldName());
-                    declaredField.setAccessible(true);
-                    Object objVal = declaredField.get(objectWithIndex);
-                    if (null != objVal) {
-                        String secondaryIndexNameNext = index.getSecondaryIndexName();
-                        if (secondaryIndexName == null) {
-                            secondaryIndexName = secondaryIndexNameNext;
-                        } else if (secondaryIndexName != null && !secondaryIndexName.equals(secondaryIndexNameNext)) {
-                            throw new RuntimeException("This is impossible to search base on more than 1 index at the same time");
-                        }
-
-                        if (objVal instanceof Collection) {
-                            List values = (List) objVal;
-                            List<AttributeValue> vals = new ArrayList<>();
-                            values.forEach(
-                                    v -> vals.add(AttributeValue.builder()
-                                            .s((String) v)
-                                            .build()));
-                            dbAttributeNameToValRestrictions.put(index.getDbAttributeName(), vals);
-                        } else {
-                            dbAttributeNameToValRestrictions.put(index.getDbAttributeName(), List.of(AttributeValue.builder()
-                                    .s((String) objVal)
-                                    .build()));
-                        }
-
-                    }
-                } catch (NoSuchFieldException | IllegalAccessException e) {
-                    throw new RuntimeException("Troubles with field parsing via findBySecondaryIndexes");
-                }
+                secondaryIndexName = processIndex(objectWithIndex, indexes, secondaryIndexName, dbAttributeNameToValRestrictions, i);
             }
             Map<String, Condition> conditions = new HashMap<>();
-//            Map<String,String> expressionAttributeNames = new HashMap<>();
-//            Map<String,String> expressionAttributeValues = new HashMap<>();
 
             dbAttributeNameToValRestrictions.forEach((key, value) -> {
 
@@ -153,8 +124,6 @@ public class DynamoDbCrudRepoImpl implements DynamoDbCrudRepo {
                         .attributeValueList(value)
                         .comparisonOperator(ComparisonOperator.EQ)
                         .build());
-
-//                expressionAttributeNames.put("#" + key, key);
             });
 
 
@@ -162,8 +131,6 @@ public class DynamoDbCrudRepoImpl implements DynamoDbCrudRepo {
                     .tableName(item.getTableName())
                     .indexName(secondaryIndexName)
                     .keyConditions(conditions)
-//                    .expressionAttributeNames(expressionAttributeNames)
-//                    .expressionAttributeValues()
                     .build();
 
             return dynamoDbAsyncClient.query(queryRequest);
@@ -202,5 +169,50 @@ public class DynamoDbCrudRepoImpl implements DynamoDbCrudRepo {
             }
         }
         return false;
+    }
+
+    protected String processIndex(Object objectWithIndex, @NotNull List<Index> indexes, String secondaryIndexName, Map<String, List<AttributeValue>> dbAttributeNameToValRestrictions, int i) {
+        Index index = indexes.get(i);
+        try {
+            Object objVal = getFieldValue(objectWithIndex, index);
+            if (null != objVal) {
+                secondaryIndexName = checkThatAllKeysForSameIndex(secondaryIndexName, index);
+                if (objVal instanceof Collection) {
+                    List<AttributeValue> vals = parseCollectionValues((List) objVal);
+                    dbAttributeNameToValRestrictions.put(index.getDbAttributeName(), vals);
+                } else {
+                    dbAttributeNameToValRestrictions.put(index.getDbAttributeName(), List.of(AttributeValue.builder()
+                            .s((String) objVal)
+                            .build()));
+                }
+            }
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException("Troubles with field parsing via findBySecondaryIndexes");
+        }
+        return secondaryIndexName;
+    }
+
+
+    protected String checkThatAllKeysForSameIndex(String secondaryIndexName, Index index) {
+        String secondaryIndexNameNext = index.getSecondaryIndexName();
+        if (secondaryIndexName == null) {
+            secondaryIndexName = secondaryIndexNameNext;
+        } else if (secondaryIndexName != null && !secondaryIndexName.equals(secondaryIndexNameNext)) {
+            throw new RuntimeException("This is impossible to search base on more than 1 index at the same time");
+        }
+        return secondaryIndexName;
+    }
+
+    protected Object getFieldValue(Object objectWithIndex, Index index) throws NoSuchFieldException, IllegalAccessException {
+        Field declaredField = objectWithIndex.getClass().getDeclaredField(index.getFieldName());
+        declaredField.setAccessible(true);
+        return declaredField.get(objectWithIndex);
+    }
+
+    protected List<AttributeValue> parseCollectionValues(List objVal) {
+        List<AttributeValue> vals = (List<AttributeValue>) objVal.stream().map(v -> AttributeValue.builder()
+                .s((String) v)
+                .build()).collect(Collectors.toList());
+        return vals;
     }
 }

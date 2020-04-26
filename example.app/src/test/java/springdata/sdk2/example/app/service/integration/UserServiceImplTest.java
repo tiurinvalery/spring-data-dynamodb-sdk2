@@ -5,14 +5,18 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.DeleteItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
+import software.amazon.awssdk.services.dynamodb.model.QueryResponse;
 import springdata.sdk2.example.app.exception.InvalidRequiredAttributeException;
 import springdata.sdk2.example.app.model.User;
 import springdata.sdk2.example.app.service.UserServiceImpl;
 
+import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -83,5 +87,25 @@ public class UserServiceImplTest {
         GetItemResponse mustBeEmpty = userService.getUser(UUID).join();
 
         assertTrue(mustBeEmpty.item().isEmpty());
+    }
+
+    @Test
+    public void getUserByIndexTest() {
+//        Prepare Users
+        String randomUsername = "username" + random.nextLong() + random.nextLong();
+        String UUID = "uuid-" + random.nextInt() + random.nextInt();
+        userService.saveUser(User.builder().uuid(UUID).username(randomUsername).build()).join();
+
+        String randomUsername1 = "username" + random.nextLong() + random.nextLong();
+        String UUID1 = "uuid-" + random.nextInt() + random.nextInt();
+        userService.saveUser(User.builder().uuid(UUID1).username(randomUsername1).build()).join();
+
+        QueryResponse userByUsername = userService.findUserByUsername(randomUsername).join();
+
+        assertEquals(new Integer(1), userByUsername.count());
+
+        Map<String, AttributeValue> stringAttributeValueMap = userByUsername.items().get(0);
+
+        assertEquals(randomUsername, stringAttributeValueMap.get("USERNAME").s());
     }
 }
