@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -17,4 +19,6 @@ public class Item {
     private Map<String, String> codeAndDbFieldMapping;
     private Map<String, KeyProperties> keys;
     private String tableName;
+    @Builder.Default
+    private List<Index> indexes = new ArrayList<>();
 }

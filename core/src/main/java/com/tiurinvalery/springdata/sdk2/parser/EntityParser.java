@@ -1,8 +1,10 @@
 package com.tiurinvalery.springdata.sdk2.parser;
 
 import com.tiurinvalery.springdata.sdk2.annotations.Attribute;
+import com.tiurinvalery.springdata.sdk2.annotations.DynamoDB2IndexHashKey;
 import com.tiurinvalery.springdata.sdk2.annotations.Key;
 import com.tiurinvalery.springdata.sdk2.annotations.Table;
+import com.tiurinvalery.springdata.sdk2.entities.Index;
 import com.tiurinvalery.springdata.sdk2.entities.Item;
 import com.tiurinvalery.springdata.sdk2.parser.data.KeyProperties;
 
@@ -31,6 +33,7 @@ public class EntityParser {
     public static Key parseField(Item item, Map<String, String> fieldMappingMap, Key key, Field f) {
         key = parseKey(item, key, f);
         parseAttributes(fieldMappingMap, f);
+        defineIndexForSearching(f, item);
         return key;
     }
 
@@ -66,6 +69,19 @@ public class EntityParser {
             item.setTableName(table.tableName());
         } catch (NullPointerException npe) {
             System.out.println(npe);
+        }
+    }
+
+    public static void defineIndexForSearching(Field f, Item item) {
+        DynamoDB2IndexHashKey[] annotationsByType = f.getAnnotationsByType(DynamoDB2IndexHashKey.class);
+        if (null != annotationsByType && annotationsByType.length > 0) {
+            DynamoDB2IndexHashKey key = annotationsByType[0];
+            Index index = Index.builder()
+                    .fieldName(f.getName())
+                    .dbAttributeName(key.attributeName())
+                    .secondaryIndexName(key.globalSecondaryIndexName())
+                    .build();
+            item.getIndexes().add(index);
         }
     }
 }

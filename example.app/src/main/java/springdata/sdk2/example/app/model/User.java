@@ -1,6 +1,7 @@
 package springdata.sdk2.example.app.model;
 
 import com.tiurinvalery.springdata.sdk2.annotations.Attribute;
+import com.tiurinvalery.springdata.sdk2.annotations.DynamoDB2IndexHashKey;
 import com.tiurinvalery.springdata.sdk2.annotations.Key;
 import com.tiurinvalery.springdata.sdk2.annotations.Table;
 import lombok.AllArgsConstructor;
@@ -21,6 +22,7 @@ public class User {
     private String uuid;
 
     @Attribute(name = "USERNAME")
+    @DynamoDB2IndexHashKey(attributeName = "USERNAME", globalSecondaryIndexName = "idndx_username")
     private String username;
 
     @Attribute(name = "APPROVED")

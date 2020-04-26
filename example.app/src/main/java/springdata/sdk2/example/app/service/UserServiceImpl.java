@@ -6,8 +6,11 @@ import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.dynamodb.model.DeleteItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
+import software.amazon.awssdk.services.dynamodb.model.QueryResponse;
 import springdata.sdk2.example.app.exception.InvalidRequiredAttributeException;
 import springdata.sdk2.example.app.model.User;
+
+import javax.annotation.PostConstruct;
 import java.util.concurrent.CompletableFuture;
 
 
@@ -27,6 +30,7 @@ public class UserServiceImpl {
 //        dynamoDbCrudRepo.findById(user).join();
 //        dynamoDbCrudRepo.save(user).join();
 //        dynamoDbCrudRepo.findById(user).join();
+//        dynamoDbCrudRepo.findBySecondaryIndexes(user).join();
 //        dynamoDbCrudRepo.delete(user).join();
 //        dynamoDbCrudRepo.findById(user).join();
 //    }
@@ -45,6 +49,10 @@ public class UserServiceImpl {
 
     public DeleteItemResponse deleteUser(String uuid) {
         return dynamoDbCrudRepo.delete(User.builder().uuid(uuid).build()).join();
+    }
+
+    public CompletableFuture<QueryResponse> findUserByUsername(String username) {
+        return dynamoDbCrudRepo.findBySecondaryIndexes(User.builder().username(username).build());
     }
 
     public void approveUser(String uuid) {
