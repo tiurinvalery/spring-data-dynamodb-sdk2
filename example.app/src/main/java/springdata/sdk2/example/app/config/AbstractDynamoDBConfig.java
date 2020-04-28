@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
-import software.amazon.awssdk.http.async.SdkAsyncHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -31,11 +30,12 @@ public class AbstractDynamoDBConfig {
 
     @Bean
     public DynamoDbAsyncClient dynamoDbAsyncClient() {
+
+
         return DynamoDbAsyncClient.builder()
                 .endpointOverride(URI.create("http://localhost:8000"))
                 .credentialsProvider(awsCredentialsProvider())
                 .region(Region.US_WEST_2)
-//                .httpClient()
                 .build();
     }
 

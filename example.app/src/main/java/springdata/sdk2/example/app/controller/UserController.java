@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
+import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.QueryResponse;
 import springdata.sdk2.example.app.model.User;
 import springdata.sdk2.example.app.service.GenerateUsersForLoadTestService;
@@ -18,6 +19,8 @@ import springdata.sdk2.example.app.service.UserServiceSyncImpl;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 public class UserController {
@@ -56,5 +59,52 @@ public class UserController {
 
         return ResponseEntity.ok(userServiceSync.saveUserSyncClient(
                 "PROD_USER", userAttributes).sdkHttpResponse().isSuccessful());
+    }
+
+    @PostMapping("/user/fullsycle")
+    public ResponseEntity<Long> startFullFlow(@RequestBody User user) throws InterruptedException, ExecutionException {
+        Long startTime = System.currentTimeMillis();
+        CompletableFuture<GetItemResponse> checkThatUserAbsent = userService.getUser(user.getUuid());
+        checkThatUserAbsent
+                .thenApplyAsync(fn -> fn.item().get("USERNAME").s().isEmpty());
+        checkThatUserAbsent.get();
+
+        CompletableFuture<PutItemResponse> putItemResponseCompletableFuture = userService.saveUser(user);
+
+        putItemResponseCompletableFuture
+                .thenAcceptAsync(fn -> {
+                    try {
+                        userService.getUser(user.getUuid()).get();
+                    } catch (InterruptedException | ExecutionException e) {
+
+                    }
+                    return;
+                });
+
+
+        Long endTime = System.currentTimeMillis();
+        return ResponseEntity.ok(endTime - startTime);
+    }
+
+    @PostMapping("/user/sync/fullsycle")
+    public ResponseEntity<Long> startFullFlowSync(@RequestBody User user) {
+        Long startTime = System.currentTimeMillis();
+
+        Map<String, String> uuid = Map.of("UUID", user.getUuid());
+        GetItemResponse prodUser = userServiceSync.getUserSync("PROD_USER", uuid);
+
+        if (prodUser.getValueForField("USERNAME", String.class).isEmpty()) {
+
+            Map<String, AttributeValue> userAttributes = Map.of("UUID", AttributeValue.builder().s(user.getUuid()).build(),
+                    "USERNAME", AttributeValue.builder().s(user.getUsername()).build());
+
+            userServiceSync.saveUserSyncClient("PROD_USER", userAttributes);
+
+            userServiceSync.getUserSync("PROD_USER", uuid);
+
+            Long endTime = System.currentTimeMillis();
+            return ResponseEntity.ok(endTime - startTime);
+        }
+        return ResponseEntity.ok(null);
     }
 }

@@ -10,6 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>exampleapp</artifactId>
+    <version>${parent.version}</version>
 
     <dependencies>
         <dependency>
@@ -22,11 +23,9 @@
             <artifactId>spring-boot-autoconfigure</artifactId>
             <version>2.2.4.RELEASE</version>
         </dependency>
-        <dependency>
+       <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>netty-nio-client</artifactId>
-            <version>2.10.24</version>
-            <scope>runtime</scope>
         </dependency>
 
 
