@@ -4,12 +4,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import software.amazon.awssdk.services.dynamodb.model.ComparisonOperator;
+import software.amazon.awssdk.services.dynamodb.model.Condition;
 import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
+import software.amazon.awssdk.services.dynamodb.model.QueryRequest;
+import software.amazon.awssdk.services.dynamodb.model.QueryResponse;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -33,6 +38,21 @@ public class UserServiceSyncImpl {
         return dynamoDbClient.getItem(GetItemRequest.builder()
                 .tableName(tableName)
                 .key(keyCollection)
+                .build());
+    }
+
+    public QueryResponse getUserByUsername(String username) {
+        Map<String, Condition> conditions = new HashMap<>();
+
+        conditions.put("USERNAME", Condition.builder()
+                .attributeValueList(List.of(AttributeValue.builder().s(username).build()))
+                .comparisonOperator(ComparisonOperator.EQ)
+                .build());
+
+        return dynamoDbClient.query(QueryRequest.builder()
+                .tableName("PROD_USER")
+                .indexName("idndx_username")
+                .keyConditions(conditions)
                 .build());
     }
 
